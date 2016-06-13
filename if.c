@@ -51,8 +51,6 @@
 
 extern int errno;
 
-struct dhcp6_if *dhcp6_if;
-
 struct dhcp6_if *
 ifinit(ifname)
 	char *ifname;

@@ -100,6 +100,7 @@ struct in6_ifreq {
 
 int foreground;
 int debug_thresh;
+struct dhcp6_if *dhcp6_if = NULL;
 
 static int dhcp6_count_list __P((struct dhcp6_list *));
 static int in6_matchflags __P((struct sockaddr *, char *, int));
@@ -1010,8 +1011,12 @@ get_duid(idfile, duid)
 		}
 	} else {
 		int l;
+		char *ifname = NULL;
 
-		if ((l = gethwid(tmpbuf, sizeof(tmpbuf), NULL, &hwtype)) < 0) {
+		if (dhcp6_if != NULL)
+			ifname = dhcp6_if->ifname;
+
+		if ((l = gethwid(tmpbuf, sizeof(tmpbuf), ifname, &hwtype)) < 0) {
 			dprintf(LOG_INFO, FNAME,
 			    "failed to get a hardware address");
 			goto fail;

@@ -210,7 +210,6 @@ main(argc, argv)
 
 	setloglevel(debug);
 
-	client6_init();
 	while (argc-- > 0) { 
 		if ((ifp = ifinit(argv[0])) == NULL) {
 			dprintf(LOG_ERR, FNAME, "failed to initialize %s",
@@ -219,6 +218,7 @@ main(argc, argv)
 		}
 		argv++;
 	}
+	client6_init();
 
 	if (infreq_mode == 0 && (cfparse(conffile)) != 0) {
 		dprintf(LOG_ERR, FNAME, "failed to parse configuration file");
