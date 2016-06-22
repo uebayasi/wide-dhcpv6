@@ -326,6 +326,13 @@ struct dhcp6opt_duid_type1 {
 	/* link-layer address follows */
 } __attribute__ ((__packed__));
 
+/* DUID type 3 */
+struct dhcp6opt_duid_type3 {
+	u_int16_t dh6_duid3_type;
+	u_int16_t dh6_duid3_hwtype;
+	/* link-layer address follows */
+} __attribute__ ((__packed__));
+
 /* Status Code */
 struct dhcp6opt_stcode {
 	u_int16_t dh6_stcode_type;

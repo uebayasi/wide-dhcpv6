@@ -995,7 +995,6 @@ get_duid(idfile, duid)
 {
 	FILE *fp = NULL;
 	u_int16_t len = 0, hwtype;
-	struct dhcp6opt_duid_type1 *dp; /* we only support the type1 DUID */
 	char tmpbuf[256];	/* DUID should be no more than 256 bytes */
 
 	if ((fp = fopen(idfile, "r")) == NULL && errno != ENOENT)
@@ -1016,7 +1015,10 @@ get_duid(idfile, duid)
 			    "failed to get a hardware address");
 			goto fail;
 		}
-		len = l + sizeof(struct dhcp6opt_duid_type1);
+		if (0/* XXX */)
+			len = l + sizeof(struct dhcp6opt_duid_type1);
+		else
+			len = l + sizeof(struct dhcp6opt_duid_type3);
 	}
 
 	memset(duid, 0, sizeof(*duid));
@@ -1036,7 +1038,8 @@ get_duid(idfile, duid)
 		dprintf(LOG_DEBUG, FNAME,
 		    "extracted an existing DUID from %s: %s",
 		    idfile, duidstr(duid));
-	} else {
+	} else if (0/* XXX */) {
+		struct dhcp6opt_duid_type1 *dp; /* we only support the type1 DUID */
 		u_int64_t t64;
 
 		dp = (struct dhcp6opt_duid_type1 *)duid->duid_id;
@@ -1046,7 +1049,15 @@ get_duid(idfile, duid)
 		t64 = (u_int64_t)(time(NULL) - 946684800);
 		dp->dh6_duid1_time = htonl((u_long)(t64 & 0xffffffff));
 		memcpy((void *)(dp + 1), tmpbuf, (len - sizeof(*dp)));
+	} else {
+		struct dhcp6opt_duid_type3 *dp;
 
+		dp = (struct dhcp6opt_duid_type3 *)duid->duid_id;
+		dp->dh6_duid3_type = htons(3); /* type 3 */
+		dp->dh6_duid3_hwtype = htons(hwtype);
+		memcpy((void *)(dp + 1), tmpbuf, (len - sizeof(*dp)));
+	}
+	if (fp == NULL) {
 		dprintf(LOG_DEBUG, FNAME, "generated a new DUID: %s",
 		    duidstr(duid));
 	}
